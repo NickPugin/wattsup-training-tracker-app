@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import { Users, Plus, KeyRound } from 'lucide-react'
+import { Users, Plus, KeyRound, Copy, CheckCheck } from 'lucide-react'
 import dayjs from 'dayjs'
 
 export default function Groups({ session }: { session: Session }) {
@@ -16,9 +16,18 @@ export default function Groups({ session }: { session: Session }) {
     const [createDesc, setCreateDesc] = useState('')
     const [isCreating, setIsCreating] = useState(false)
 
+    // Copy to clipboard state
+    const [copiedCode, setCopiedCode] = useState<string | null>(null)
+
     useEffect(() => {
         fetchMyGroups()
     }, [])
+
+    const handleCopy = (code: string) => {
+        navigator.clipboard.writeText(code)
+        setCopiedCode(code)
+        setTimeout(() => setCopiedCode(null), 2000)
+    }
 
     const fetchMyGroups = async () => {
         try {
@@ -244,9 +253,18 @@ export default function Groups({ session }: { session: Session }) {
                                     )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem' }}>
                                         <span style={{ color: 'var(--text-muted)' }}>Invite Code:</span>
-                                        <code style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '4px', color: 'var(--energy)', fontWeight: 'bold', letterSpacing: '1px' }}>
-                                            {group.invite_code}
-                                        </code>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                                            <code style={{ color: 'var(--energy)', fontWeight: 'bold', letterSpacing: '1px' }}>
+                                                {group.invite_code}
+                                            </code>
+                                            <button
+                                                onClick={() => handleCopy(group.invite_code)}
+                                                style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: copiedCode === group.invite_code ? 'var(--success)' : 'var(--text-muted)' }}
+                                                title="Copy to clipboard"
+                                            >
+                                                {copiedCode === group.invite_code ? <CheckCheck size={14} /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>

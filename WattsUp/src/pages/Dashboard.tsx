@@ -240,7 +240,9 @@ export default function Dashboard({ session }: { session: Session }) {
                                                             {rider.username.charAt(0).toUpperCase()}
                                                         </div>
                                                     )}
-                                                    <span className="text-gradient hover:underline">{rider.username}</span>
+                                                    <span className="text-gradient hover:underline">
+                                                        {rider.nationality ? rider.nationality.substring(0, 2) + ' ' : ''}{rider.username}
+                                                    </span>
                                                 </button>
                                                 {rider.id === session.user.id && <span style={{ fontSize: '0.75rem', padding: '2px 6px', background: 'var(--primary)', borderRadius: '12px', color: 'white' }}>You</span>}
                                             </div>

@@ -11,6 +11,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
 
     // Edit form state
     const [username, setUsername] = useState('')
+    const [nationality, setNationality] = useState('')
     const [isPublic, setIsPublic] = useState(true)
     const [bikeModel, setBikeModel] = useState('')
     const [bikeNickname, setBikeNickname] = useState('')
@@ -60,6 +61,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
             if (error) throw error
             setProfile(data)
             setUsername(data.username || '')
+            setNationality(data.nationality || '')
             // Default to true if somehow undefined, mapping to the new DB default
             setIsPublic(data.is_public !== false)
             // Note: we're reusing bike_type in the DB as bike_model to keep the schema simple
@@ -82,6 +84,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                 .from('profiles')
                 .update({
                     username: username,
+                    nationality: nationality,
                     is_public: isPublic,
                     bike_type: bikeModel,
                     bike_nickname: bikeNickname,
@@ -227,6 +230,32 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                     </div>
 
                                     <div>
+                                        <label>Nationality</label>
+                                        <div className="select-container">
+                                            <select value={nationality} onChange={e => setNationality(e.target.value)}>
+                                                <option value="">None</option>
+                                                <option value="🇺🇸 United States">🇺🇸 United States</option>
+                                                <option value="🇬🇧 United Kingdom">🇬🇧 United Kingdom</option>
+                                                <option value="🇨🇦 Canada">🇨🇦 Canada</option>
+                                                <option value="🇦🇺 Australia">🇦🇺 Australia</option>
+                                                <option value="🇫🇷 France">🇫🇷 France</option>
+                                                <option value="🇮🇹 Italy">🇮🇹 Italy</option>
+                                                <option value="🇪🇸 Spain">🇪🇸 Spain</option>
+                                                <option value="🇩🇪 Germany">🇩🇪 Germany</option>
+                                                <option value="🇳🇱 Netherlands">🇳🇱 Netherlands</option>
+                                                <option value="🇧🇪 Belgium">🇧🇪 Belgium</option>
+                                                <option value="🇨🇭 Switzerland">🇨🇭 Switzerland</option>
+                                                <option value="🇨🇴 Colombia">🇨🇴 Colombia</option>
+                                                <option value="🇸🇮 Slovenia">🇸🇮 Slovenia</option>
+                                                <option value="🇩🇰 Denmark">🇩🇰 Denmark</option>
+                                                <option value="🇳🇴 Norway">🇳🇴 Norway</option>
+                                                <option value="🇿🇦 South Africa">🇿🇦 South Africa</option>
+                                                <option value="🇯🇵 Japan">🇯🇵 Japan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
                                         <label>Fun Team Catchphrase / Motto</label>
                                         <input type="text" placeholder="e.g. Shut up legs!" value={catchphrase} onChange={e => setCatchphrase(e.target.value)} maxLength={50} />
                                     </div>
@@ -266,6 +295,10 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
                                         <span style={{ color: 'var(--text-muted)' }}>Estimated FTP</span>
                                         <span style={{ fontWeight: 600 }}>{profile.estimated_ftp ? `${profile.estimated_ftp} W` : 'Unknown'}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>Nationality</span>
+                                        <span style={{ fontWeight: 600 }}>{profile.nationality || 'None'}</span>
                                     </div>
 
                                     {isOwner && (
