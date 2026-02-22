@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import { Trophy, TrendingUp, Clock, Zap } from 'lucide-react'
+import { Trophy, TrendingUp, Clock, Zap, EyeOff } from 'lucide-react'
 
 import ProfileModal from '../components/ProfileModal'
 
@@ -114,8 +114,17 @@ export default function Dashboard({ session }: { session: Session }) {
     }
 
     // Find current user's stats
-    const myStats = leaderboard.find(l => l.id === session.user.id) || { total_kwh: 0, total_hours: 0, session_count: 0 }
-    const myRank = leaderboard.findIndex(l => l.id === session.user.id) + 1
+    const myStats = leaderboard.find(l => l.id === session.user.id) || { total_kwh: 0, total_hours: 0, session_count: 0, is_public: true }
+
+    // Determine if the user is currently viewing the global leaderboard but has a private profile
+    const isMePrivateGlobal = selectedGroup === 'global' && myStats.is_public === false
+
+    // Filter the user completely out of the rendered leaderboard if they are private on the global tab
+    const displayLeaderboard = isMePrivateGlobal
+        ? leaderboard.filter(l => l.id !== session.user.id)
+        : leaderboard
+
+    const myRank = isMePrivateGlobal ? 0 : (displayLeaderboard.findIndex(l => l.id === session.user.id) + 1)
 
     // Determine rank colors
     const getRankColor = (rank: number) => {
@@ -196,15 +205,17 @@ export default function Dashboard({ session }: { session: Session }) {
                         </div>
                     </div>
                     <button
-                        onClick={() => userRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: rankBg, border: `1px solid ${rankBorder}`, padding: '6px 12px', borderRadius: '20px', cursor: 'pointer', transition: 'transform 0.2s', outline: 'none' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        title="Scroll to my position"
+                        onClick={() => {
+                            if (!isMePrivateGlobal) userRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: isMePrivateGlobal ? 'rgba(255,255,255,0.05)' : rankBg, border: `1px solid ${isMePrivateGlobal ? 'rgba(255,255,255,0.1)' : rankBorder}`, padding: '6px 12px', borderRadius: '20px', cursor: isMePrivateGlobal ? 'default' : 'pointer', transition: 'transform 0.2s', outline: 'none' }}
+                        onMouseEnter={(e) => { if (!isMePrivateGlobal) e.currentTarget.style.transform = 'scale(1.05)' }}
+                        onMouseLeave={(e) => { if (!isMePrivateGlobal) e.currentTarget.style.transform = 'scale(1)' }}
+                        title={isMePrivateGlobal ? "Your profile is private" : "Scroll to my position"}
                     >
-                        <Trophy size={16} color={rankColor} />
-                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: rankColor }}>
-                            Your Rank: #{myRank > 0 ? myRank : '-'}
+                        {isMePrivateGlobal ? <EyeOff size={16} color="var(--text-muted)" /> : <Trophy size={16} color={rankColor} />}
+                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: isMePrivateGlobal ? 'var(--text-muted)' : rankColor }}>
+                            {isMePrivateGlobal ? 'Hidden (Private)' : `Your Rank: #${myRank > 0 ? myRank : '-'}`}
                         </span>
                     </button>
                 </div>
@@ -223,7 +234,7 @@ export default function Dashboard({ session }: { session: Session }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {leaderboard.map((rider, index) => (
+                                {displayLeaderboard.map((rider, index) => (
                                     <tr
                                         key={rider.id}
                                         ref={rider.id === session.user.id ? userRowRef : null}
@@ -263,7 +274,7 @@ export default function Dashboard({ session }: { session: Session }) {
                                     </tr>
                                 ))}
 
-                                {leaderboard.length === 0 && (
+                                {displayLeaderboard.length === 0 && (
                                     <tr>
                                         <td colSpan={4} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
                                             No riders found. Start logging sessions!
