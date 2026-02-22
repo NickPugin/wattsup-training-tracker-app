@@ -343,61 +343,65 @@ button {
 /* 2-line Responsive Mobile Override */
 @media (max-width: 767px) {
   .session-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    /* Give energy slightly more room */
+    row-gap: 8px;
     padding: 16px 12px;
-    gap: 8px;
     position: relative;
-  }
-
-  /* Div 1 - break visually */
-  .session-grid::after {
-    content: "";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.05);
-    margin: 4px 0;
-    order: 2; /* Put divider between row 1 and row 2 */
+    /* Reset widths/alignments from flex desktop */
+    align-items: center;
   }
 
   /* Row 1 Content */
   .session-date {
-    width: 35%;
+    grid-column: 1 / 2;
+    grid-row: 1;
     font-size: 0.85rem;
     color: var(--text-muted);
-    order: 1;
   }
 
   .session-rider {
-    width: 60%;
+    grid-column: 2 / 4;
+    grid-row: 1;
     justify-content: flex-end;
-    padding-right: 32px; /* Pad to avoid absolute delete btn */
-    order: 1;
+    padding-right: 32px;
+    /* Pad to avoid absolute delete btn */
+  }
+
+  /* Break Visually (Divider) */
+  .session-grid::after {
+    content: "";
+    grid-column: 1 / 4;
+    grid-row: 2;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.05);
+    margin: 4px 0;
   }
 
   /* Row 2 Content */
   .session-time {
-    width: 25%;
+    grid-column: 1 / 2;
+    grid-row: 3;
     display: flex;
     flex-direction: column;
-    order: 3;
   }
 
   .session-watts {
-    width: 25%;
+    grid-column: 2 / 3;
+    grid-row: 3;
     display: flex;
     flex-direction: column;
-    order: 3;
   }
 
   .session-energy {
-    width: 45%;
+    grid-column: 3 / 4;
+    grid-row: 3;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-end;
     font-size: 1.25rem;
-    order: 3;
   }
 
   .sm-label {
