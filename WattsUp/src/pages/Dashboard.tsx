@@ -64,8 +64,8 @@ export default function Dashboard({ session }: { session: Session }) {
             // 1. Fetch profiles based on filter
             let profileQuery = supabase.from('profiles').select('*')
             if (selectedGroup === 'global') {
-                // Show public profiles on global leaderboard
-                profileQuery = profileQuery.eq('is_public', true)
+                // Show public profiles on global leaderboard, but ALWAYS include the current user so their stats don't say 0
+                profileQuery = profileQuery.or(`is_public.eq.true,id.eq.${session.user.id}`)
             } else if (userIdsForFilter) {
                 // For groups, show all members regardless of public/private status
                 profileQuery = profileQuery.in('id', userIdsForFilter)
