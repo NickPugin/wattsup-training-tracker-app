@@ -215,7 +215,7 @@ export default function Dashboard({ session }: { session: Session }) {
                     >
                         {isMePrivateGlobal ? <EyeOff size={16} color="var(--text-muted)" /> : <Trophy size={16} color={rankColor} />}
                         <span style={{ fontSize: '0.875rem', fontWeight: 700, color: isMePrivateGlobal ? 'var(--text-muted)' : rankColor }}>
-                            {isMePrivateGlobal ? 'Hidden (Private)' : `Your Rank: #${myRank > 0 ? myRank : '-'}`}
+                            {isMePrivateGlobal ? 'No Global Ranking (Private)' : `Your Rank: #${myRank > 0 ? myRank : '-'}`}
                         </span>
                     </button>
                 </div>

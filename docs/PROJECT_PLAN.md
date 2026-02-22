@@ -54,4 +54,27 @@ CycleTraining/
 1. **Initialize Project:** Create folder structure (`frontend`, `backend`, `docs`).
 2. **Setup Dev Environment:** Create the local `docker-compose.yml` for database testing, and initialize vite frontend.
 
-... (Proceed to Phases 2-4 of implementation)
+### Phase 2: Backend Development (API & Logic)
+* **Step 5:** Implement User Authentication (signup, login, JWT/session management, password hashing).
+* **Step 6:** Build the `Users/Profiles` API endpoints (GET user, UPDATE user details).
+* **Step 7:** Build the `Sessions` API endpoints (POST new session, DELETE session via ownership check, GET all sessions, GET sessions by user).
+* **Step 8:** Implement the sorting and aggregation logic on the backend to easily serve the Dashboard totals (summing minutes and calculating total kWh).
+
+### Phase 3: Frontend Development (UI & Integration)
+* **Step 9:** Setup the frontend application shell and routing (Login page, Dashboard, Sessions Table layout).
+* **Step 10:** Build the Authentication UI (Login and Registration forms) and connect to the backend context/state.
+* **Step 11:** Develop the **Dashboard Page**:
+  * Fetch and render the team totals.
+  * Implement the Profile Pop-up Modal (UI and data fetching).
+* **Step 12:** Develop the **Sessions Page**:
+  * Render the main data table.
+  * Implement the "Add Session" modal triggered by the top-right Plus icon.
+  * Ensure the local kWh calculation works securely/correctly before sending to API.
+  * Implement the specific "click-to-delete" functionality with a confirmation dialog (ensuring only the owner sees this option).
+* **Step 13:** Develop the **User Profile Management**:
+  * Allow the logged-in user to upload a picture and update their bike type and FTP.
+
+### Phase 4: Polish, Testing, and Deployment
+* **Step 14:** General UI/UX polish (responsive design for mobile and desktop, loading states, error handling notifications).
+* **Step 15:** Security and Testing (Test API endpoints, verify session deletion rules, test authentication payload).
+* **Step 16:** Final Build and Deployment (Deploy Database, Backend, and Frontend to platforms like Vercel, Render, or Heroku).
