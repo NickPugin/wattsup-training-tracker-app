@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Session } from '@supabase/supabase-js'
-import { LayoutDashboard, ListIcon, LogOut, Zap, User } from 'lucide-react'
+import { LayoutDashboard, ListIcon, LogOut, Zap, User, Users } from 'lucide-react'
 import ProfileModal from './ProfileModal'
 
 export default function Layout({ session }: { session: Session }) {
@@ -76,6 +76,25 @@ export default function Layout({ session }: { session: Session }) {
                         >
                             <ListIcon size={18} />
                             <span className="hide-mobile">Sessions</span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/groups"
+                            style={({ isActive }) => ({
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '8px 16px',
+                                borderRadius: 'var(--radius-md)',
+                                textDecoration: 'none',
+                                color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                                backgroundColor: isActive ? 'var(--bg-overlay)' : 'transparent',
+                                fontWeight: isActive ? 600 : 500,
+                                transition: 'all 0.2s'
+                            })}
+                        >
+                            <Users size={18} />
+                            <span className="hide-mobile">Teams</span>
                         </NavLink>
                     </div>
 

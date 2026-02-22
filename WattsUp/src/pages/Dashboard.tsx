@@ -10,18 +10,79 @@ export default function Dashboard({ session }: { session: Session }) {
     const [leaderboard, setLeaderboard] = useState<any[]>([])
     const [selectedUser, setSelectedUser] = useState<string | null>(null)
 
+    // Filtering State
+    const [groups, setGroups] = useState<any[]>([])
+    const [selectedGroup, setSelectedGroup] = useState<string>('global')
+
     useEffect(() => {
-        fetchLeaderboard()
+        fetchMyGroups()
     }, [])
 
-    const fetchLeaderboard = async () => {
+    useEffect(() => {
+        fetchLeaderboard()
+    }, [selectedGroup])
+
+    const fetchMyGroups = async () => {
         try {
-            // 1. Fetch all profiles
-            const { data: profiles, error: profileErr } = await supabase.from('profiles').select('*')
+            const { data, error } = await supabase
+                .from('group_members')
+                .select(`group_id, groups (id, name)`)
+                .eq('user_id', session.user.id)
+
+            if (error) throw error
+            const mappedGroups = data?.map(d => d.groups).filter(Boolean) || []
+            setGroups(mappedGroups)
+        } catch (error) {
+            console.error('Error fetching groups:', error)
+        }
+    }
+
+    const fetchLeaderboard = async () => {
+        setLoading(true)
+        try {
+            let userIdsForFilter: string[] | null = null;
+
+            if (selectedGroup !== 'global') {
+                const { data: members, error: membersError } = await supabase
+                    .from('group_members')
+                    .select('user_id')
+                    .eq('group_id', selectedGroup)
+
+                if (membersError) throw membersError
+                userIdsForFilter = members?.map(m => m.user_id) || []
+
+                if (userIdsForFilter.length === 0) {
+                    setLeaderboard([])
+                    setLoading(false)
+                    return
+                }
+            }
+
+            // 1. Fetch profiles based on filter
+            let profileQuery = supabase.from('profiles').select('*')
+            if (selectedGroup === 'global') {
+                // Show public profiles on global leaderboard
+                profileQuery = profileQuery.eq('is_public', true)
+            } else if (userIdsForFilter) {
+                // For groups, show all members regardless of public/private status
+                profileQuery = profileQuery.in('id', userIdsForFilter)
+            }
+            const { data: profiles, error: profileErr } = await profileQuery
             if (profileErr) throw profileErr
 
-            // 2. Fetch all sessions to calculate totals
-            const { data: sessions, error: sessionErr } = await supabase.from('sessions').select('*')
+            if (!profiles || profiles.length === 0) {
+                setLeaderboard([])
+                setLoading(false)
+                return
+            }
+
+            // 2. Fetch sessions specifically for these users
+            const profileIds = profiles.map(p => p.id)
+            const { data: sessions, error: sessionErr } = await supabase
+                .from('sessions')
+                .select('*')
+                .in('user_id', profileIds)
+
             if (sessionErr) throw sessionErr
 
             // 3. Aggregate data
@@ -114,9 +175,23 @@ export default function Dashboard({ session }: { session: Session }) {
             {/* Leaderboard Table */}
             <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: 0 }}>
-                        <TrendingUp color="var(--primary)" /> Leaderboard
-                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.25rem' }}>
+                            <TrendingUp color="var(--primary)" size={20} /> Leaderboard
+                        </h2>
+                        <div className="select-container" style={{ width: 'auto', minWidth: '150px' }}>
+                            <select
+                                value={selectedGroup}
+                                onChange={(e) => setSelectedGroup(e.target.value)}
+                                style={{ padding: '4px 12px', fontSize: '0.875rem', backgroundColor: 'var(--bg-base)' }}
+                            >
+                                <option value="global">Global (Public)</option>
+                                {groups.map(g => (
+                                    <option key={g.id} value={g.id}>Team: {g.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: rankBg, border: `1px solid ${rankBorder}`, padding: '6px 12px', borderRadius: '20px' }}>
                         <Trophy size={16} color={rankColor} />
                         <span style={{ fontSize: '0.875rem', fontWeight: 700, color: rankColor }}>

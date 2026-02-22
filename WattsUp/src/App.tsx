@@ -7,6 +7,7 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Sessions from './pages/Sessions'
+import Groups from './pages/Groups'
 
 function App() {
     const [session, setSession] = useState<Session | null>(null)
@@ -47,6 +48,7 @@ function App() {
                 <Route element={session ? <Layout session={session} /> : <Navigate to="/login" />}>
                     <Route path="/" element={<Dashboard session={session!} />} />
                     <Route path="/sessions" element={<Sessions session={session!} />} />
+                    <Route path="/groups" element={<Groups session={session!} />} />
                 </Route>
             </Routes>
         </Router>

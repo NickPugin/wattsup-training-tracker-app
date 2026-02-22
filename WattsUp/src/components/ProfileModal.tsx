@@ -10,6 +10,8 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
     const [isEditing, setIsEditing] = useState(false)
 
     // Edit form state
+    const [username, setUsername] = useState('')
+    const [isPublic, setIsPublic] = useState(true)
     const [bikeModel, setBikeModel] = useState('')
     const [bikeNickname, setBikeNickname] = useState('')
     const [ftp, setFtp] = useState('')
@@ -57,10 +59,10 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
             const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
             if (error) throw error
             setProfile(data)
-            // Note: we're reusing bike_type in the DB as bike_model to keep the schema simple,
-            // but we'll show 'Bike Model' in the UI. 
-            // Or wait, the user said add 'Bike nickname'. And change 'Bike type' to 'Bike model'.
-            // Let's just use bike_type for model, and add bike_nickname!
+            setUsername(data.username || '')
+            // Default to true if somehow undefined, mapping to the new DB default
+            setIsPublic(data.is_public !== false)
+            // Note: we're reusing bike_type in the DB as bike_model to keep the schema simple
             setBikeModel(data.bike_type || '')
             setBikeNickname(data.bike_nickname || '')
             setFtp(data.estimated_ftp?.toString() || '')
@@ -79,6 +81,8 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
             const { error } = await supabase
                 .from('profiles')
                 .update({
+                    username: username,
+                    is_public: isPublic,
                     bike_type: bikeModel,
                     bike_nickname: bikeNickname,
                     estimated_ftp: ftp ? parseInt(ftp) : null,
@@ -203,6 +207,25 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                             })}
                                         </div>
                                     </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
+                                        <div>
+                                            <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '2px' }}>Public Profile</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Show my stats on the global leaderboard.</div>
+                                        </div>
+                                        <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', margin: 0 }}>
+                                            <input type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+                                            <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: isPublic ? 'var(--primary)' : 'var(--border)', transition: '.3s', borderRadius: '24px' }}>
+                                                <span style={{ position: 'absolute', content: '""', height: '18px', width: '18px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.3s', borderRadius: '50%', transform: isPublic ? 'translateX(20px)' : 'translateX(0)' }}></span>
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label>Username</label>
+                                        <input type="text" placeholder="e.g. SprintKing" value={username} onChange={e => setUsername(e.target.value)} maxLength={20} required />
+                                    </div>
+
                                     <div>
                                         <label>Fun Team Catchphrase / Motto</label>
                                         <input type="text" placeholder="e.g. Shut up legs!" value={catchphrase} onChange={e => setCatchphrase(e.target.value)} maxLength={50} />
@@ -226,6 +249,12 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                 </div>
                             ) : (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>Profile Visibility</span>
+                                        <span style={{ fontWeight: 600, color: profile.is_public !== false ? 'var(--success)' : 'var(--text-muted)' }}>
+                                            {profile.is_public !== false ? 'Public' : 'Private'}
+                                        </span>
+                                    </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
                                         <span style={{ color: 'var(--text-muted)' }}>Bike Model</span>
                                         <span style={{ fontWeight: 600 }}>{profile.bike_type || 'Unknown'}</span>

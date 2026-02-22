@@ -9,6 +9,10 @@ export default function Sessions({ session }: { session: Session }) {
     const [loading, setLoading] = useState(true)
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
+    // Filtering State
+    const [groups, setGroups] = useState<any[]>([])
+    const [selectedGroup, setSelectedGroup] = useState<string>('mine')
+
     // Form State
     const [date, setDate] = useState(dayjs().format('YYYY-MM-DD'))
     const [minutes, setMinutes] = useState('')
@@ -16,20 +20,66 @@ export default function Sessions({ session }: { session: Session }) {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
-        fetchSessions()
+        fetchMyGroups()
     }, [])
 
-    const fetchSessions = async () => {
+    useEffect(() => {
+        fetchSessions()
+    }, [selectedGroup])
+
+    const fetchMyGroups = async () => {
         try {
-            // For now, let's fetch my sessions. Wait, requirement says "A tabular view of all training sessions (can be filtered by team or individual)". 
-            // Let's just fetch all sessions and join with profiles to get the username.
             const { data, error } = await supabase
+                .from('group_members')
+                .select(`group_id, groups (id, name)`)
+                .eq('user_id', session.user.id)
+
+            if (error) throw error
+            const mappedGroups = data?.map(d => d.groups).filter(Boolean) || []
+            setGroups(mappedGroups)
+        } catch (error) {
+            console.error('Error fetching groups:', error)
+        }
+    }
+
+    const fetchSessions = async () => {
+        setLoading(true)
+        try {
+            let userIdsForFilter: string[] | null = null;
+
+            if (selectedGroup !== 'mine') {
+                // Fetch members of the selected group
+                const { data: members, error: membersError } = await supabase
+                    .from('group_members')
+                    .select('user_id')
+                    .eq('group_id', selectedGroup)
+
+                if (membersError) throw membersError
+                userIdsForFilter = members?.map(m => m.user_id) || []
+
+                // If the group has no members (impossible since we are in it, but defensively protect), return empty
+                if (userIdsForFilter.length === 0) {
+                    setSessions([])
+                    setLoading(false)
+                    return
+                }
+            }
+
+            let query = supabase
                 .from('sessions')
                 .select(`
-          *,
-          profiles ( username, picture_url )
-        `)
+                    *,
+                    profiles ( username, picture_url )
+                `)
                 .order('date', { ascending: false })
+
+            if (selectedGroup === 'mine') {
+                query = query.eq('user_id', session.user.id)
+            } else if (userIdsForFilter) {
+                query = query.in('user_id', userIdsForFilter)
+            }
+
+            const { data, error } = await query
 
             if (error) throw error
             setSessions(data || [])
@@ -95,7 +145,21 @@ export default function Sessions({ session }: { session: Session }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
                 <div>
                     <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Training Sessions</h1>
-                    <p className="text-muted">Review the team's latest efforts.</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className="text-muted" style={{ fontSize: '0.875rem' }}>Showing:</span>
+                        <div className="select-container" style={{ width: 'auto', minWidth: '150px' }}>
+                            <select
+                                value={selectedGroup}
+                                onChange={(e) => setSelectedGroup(e.target.value)}
+                                style={{ padding: '4px 12px', fontSize: '0.875rem', backgroundColor: 'var(--bg-base)' }}
+                            >
+                                <option value="mine">Only Mine</option>
+                                {groups.map(g => (
+                                    <option key={g.id} value={g.id}>Team: {g.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {/* The required Plus Icon button for adding sessions */}
