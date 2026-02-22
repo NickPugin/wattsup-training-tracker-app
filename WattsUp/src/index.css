@@ -279,3 +279,140 @@ button {
 .animate-fade-in {
   animation: fadeIn 0.4s ease forwards;
 }
+
+/* Sessions Grid Layout */
+.session-grid {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 2fr 1fr 1fr 1fr 40px;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 16px;
+  transition: background 0.2s ease;
+}
+
+.session-row:hover .session-grid {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.session-date {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.session-rider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-time,
+.session-watts {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.session-energy {
+  font-weight: 800;
+  color: var(--text-main);
+  font-size: 1.125rem;
+}
+
+.sm-label {
+  display: none;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* 2-line Responsive Mobile Override */
+@media (max-width: 767px) {
+  .session-grid {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 16px 12px;
+    gap: 8px;
+    position: relative;
+  }
+
+  /* Div 1 - break visually */
+  .session-grid::after {
+    content: "";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.05);
+    margin: 4px 0;
+    order: 2; /* Put divider between row 1 and row 2 */
+  }
+
+  /* Row 1 Content */
+  .session-date {
+    width: 35%;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    order: 1;
+  }
+
+  .session-rider {
+    width: 60%;
+    justify-content: flex-end;
+    padding-right: 32px; /* Pad to avoid absolute delete btn */
+    order: 1;
+  }
+
+  /* Row 2 Content */
+  .session-time {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    order: 3;
+  }
+
+  .session-watts {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    order: 3;
+  }
+
+  .session-energy {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    font-size: 1.25rem;
+    order: 3;
+  }
+
+  .sm-label {
+    display: inline-block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .session-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+}

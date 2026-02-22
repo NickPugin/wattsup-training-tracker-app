@@ -113,29 +113,44 @@ export default function Sessions({ session }: { session: Session }) {
                 {loading ? (
                     <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading sessions...</div>
                 ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead>
-                                <tr style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                                    <th style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Date</th>
-                                    <th style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Rider</th>
-                                    <th className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Time</th>
-                                    <th className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Avg Watts</th>
-                                    <th style={{ padding: '16px 20px', color: 'var(--primary)', fontWeight: 700, fontSize: '0.875rem' }}>Energy</th>
-                                    <th style={{ padding: '16px 20px', textAlign: 'right' }}></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sessions.map((s) => {
-                                    const isOwner = s.user_id === session.user.id
+                    <div className="sessions-list">
+                        {/* Desktop Header */}
+                        <div className="hide-mobile" style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'minmax(100px, 1fr) 2fr 1fr 1fr 1fr 40px',
+                            padding: '16px 20px',
+                            backgroundColor: 'rgba(255,255,255,0.02)',
+                            color: 'var(--text-muted)',
+                            fontWeight: 600,
+                            fontSize: '0.875rem',
+                            borderBottom: '1px solid var(--border)'
+                        }}>
+                            <div>Date</div>
+                            <div>Rider</div>
+                            <div>Time</div>
+                            <div>Avg Watts</div>
+                            <div style={{ color: 'var(--primary)', fontWeight: 700 }}>Energy</div>
+                            <div></div>
+                        </div>
 
+                        {/* List Body */}
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {sessions.length === 0 ? (
+                                <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                    No sessions logged yet.
+                                </div>
+                            ) : (
+                                sessions.map((s) => {
+                                    const isOwner = s.user_id === session.user.id
                                     return (
-                                        <tr key={s.id} style={{ borderTop: '1px solid var(--border)', transition: 'background 0.2s' }}>
-                                            <td style={{ padding: '16px 20px', color: 'var(--text-main)', whiteSpace: 'nowrap' }}>
-                                                {dayjs(s.date).format('MMM D, YY')}
-                                            </td>
-                                            <td className="mobile-tight-text" style={{ padding: '16px 20px', fontWeight: 600 }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div key={s.id} className="session-row" style={{ borderBottom: '1px solid var(--border)' }}>
+                                            {/* Row Content (Grid on Desktop, Flex Column on Mobile) */}
+                                            <div className="session-grid">
+                                                <div className="session-date">
+                                                    {dayjs(s.date).format('MMM D, YY')}
+                                                </div>
+                                                
+                                                <div className="session-rider">
                                                     {s.profiles?.picture_url ? (
                                                         <img src={`/avatars/${s.profiles.picture_url}`} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border)', backgroundColor: 'var(--bg-base)' }} />
                                                     ) : (
@@ -143,40 +158,38 @@ export default function Sessions({ session }: { session: Session }) {
                                                             {s.profiles?.username?.charAt(0).toUpperCase() || '?'}
                                                         </div>
                                                     )}
-                                                    {s.profiles?.username || 'Unknown'}
+                                                    <span style={{ fontWeight: 600 }}>{s.profiles?.username || 'Unknown'}</span>
                                                 </div>
-                                            </td>
-                                            <td className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>{s.minutes}m</td>
-                                            <td className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>{s.average_wattage}W</td>
-                                            <td style={{ padding: '16px 20px', fontWeight: 800, color: 'var(--text-main)' }}>
-                                                {parseFloat(s.kwh).toFixed(2)} <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>kWh</span>
-                                            </td>
-                                            <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                                                {isOwner && (
-                                                    <button
-                                                        onClick={() => handleDelete(s.id)}
-                                                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', opacity: 0.7, padding: '8px' }}
-                                                        onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
-                                                        onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
-                                                        title="Delete Session"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
+                                                
+                                                <div className="session-time">
+                                                    <span className="sm-label">Time: </span>{s.minutes}m
+                                                </div>
+                                                
+                                                <div className="session-watts">
+                                                    <span className="sm-label">Avg: </span>{s.average_wattage}W
+                                                </div>
+                                                
+                                                <div className="session-energy">
+                                                    {parseFloat(s.kwh).toFixed(2)} <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>kWh</span>
+                                                </div>
+                                                
+                                                <div className="session-actions" style={{ textAlign: 'right' }}>
+                                                    {isOwner && (
+                                                        <button
+                                                            onClick={() => handleDelete(s.id)}
+                                                            className="delete-btn"
+                                                            title="Delete Session"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
                                     )
-                                })}
-
-                                {sessions.length === 0 && (
-                                    <tr>
-                                        <td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                            No sessions logged yet.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                })
+                            )}
+                        </div>
                     </div>
                 )}
             </div>

@@ -56,7 +56,7 @@ export default function Layout({ session }: { session: Session }) {
                             })}
                         >
                             <LayoutDashboard size={18} />
-                            <span>Dashboard</span>
+                            <span className="hide-mobile">Dashboard</span>
                         </NavLink>
 
                         <NavLink
@@ -75,7 +75,7 @@ export default function Layout({ session }: { session: Session }) {
                             })}
                         >
                             <ListIcon size={18} />
-                            <span>Sessions</span>
+                            <span className="hide-mobile">Sessions</span>
                         </NavLink>
                     </div>
 
