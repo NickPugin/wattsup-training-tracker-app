@@ -155,7 +155,7 @@ export default function Sessions({ session }: { session: Session }) {
                             >
                                 <option value="mine">Only Mine</option>
                                 {groups.map(g => (
-                                    <option key={g.id} value={g.id}>Team: {g.name}</option>
+                                    <option key={g.id} value={g.id}>{g.name}</option>
                                 ))}
                             </select>
                         </div>

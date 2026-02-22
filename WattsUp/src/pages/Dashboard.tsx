@@ -175,19 +175,19 @@ export default function Dashboard({ session }: { session: Session }) {
             {/* Leaderboard Table */}
             <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.25rem' }}>
-                            <TrendingUp color="var(--primary)" size={20} /> Leaderboard
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.25rem', whiteSpace: 'nowrap' }}>
+                            <TrendingUp color="var(--primary)" size={20} className="hide-mobile" /> Leaderboard
                         </h2>
-                        <div className="select-container" style={{ width: 'auto', minWidth: '150px' }}>
+                        <div className="select-container" style={{ flex: 1, minWidth: '100px' }}>
                             <select
                                 value={selectedGroup}
                                 onChange={(e) => setSelectedGroup(e.target.value)}
-                                style={{ padding: '4px 12px', fontSize: '0.875rem', backgroundColor: 'var(--bg-base)' }}
+                                style={{ padding: '4px 8px', fontSize: '0.875rem', backgroundColor: 'var(--bg-base)', width: '100%' }}
                             >
                                 <option value="global">Global (Public)</option>
                                 {groups.map(g => (
-                                    <option key={g.id} value={g.id}>Team: {g.name}</option>
+                                    <option key={g.id} value={g.id}>{g.name}</option>
                                 ))}
                             </select>
                         </div>

@@ -251,6 +251,39 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                                 <option value="🇳🇴 Norway">🇳🇴 Norway</option>
                                                 <option value="🇿🇦 South Africa">🇿🇦 South Africa</option>
                                                 <option value="🇯🇵 Japan">🇯🇵 Japan</option>
+                                                <option value="🇮🇪 Ireland">🇮🇪 Ireland</option>
+                                                <option value="🇳🇿 New Zealand">🇳🇿 New Zealand</option>
+                                                <option value="🇵🇱 Poland">🇵🇱 Poland</option>
+                                                <option value="🇵🇹 Portugal">🇵🇹 Portugal</option>
+                                                <option value="🇸🇪 Sweden">🇸🇪 Sweden</option>
+                                                <option value="🇦🇹 Austria">🇦🇹 Austria</option>
+                                                <option value="🇨🇿 Czech Republic">🇨🇿 Czech Republic</option>
+                                                <option value="🇪🇨 Ecuador">🇪🇨 Ecuador</option>
+                                                <option value="🇷🇺 Russia">🇷🇺 Russia</option>
+                                                <option value="🇨🇳 China">🇨🇳 China</option>
+                                                <option value="🇰🇷 South Korea">🇰🇷 South Korea</option>
+                                                <option value="🇧🇷 Brazil">🇧🇷 Brazil</option>
+                                                <option value="🇦🇷 Argentina">🇦🇷 Argentina</option>
+                                                <option value="🇲🇽 Mexico">🇲🇽 Mexico</option>
+                                                <option value="🇨🇱 Chile">🇨🇱 Chile</option>
+                                                <option value="🇮🇳 India">🇮🇳 India</option>
+                                                <option value="🇵🇭 Philippines">🇵🇭 Philippines</option>
+                                                <option value="🇹🇼 Taiwan">🇹🇼 Taiwan</option>
+                                                <option value="🇲🇾 Malaysia">🇲🇾 Malaysia</option>
+                                                <option value="🇸🇬 Singapore">🇸🇬 Singapore</option>
+                                                <option value="🇮🇩 Indonesia">🇮🇩 Indonesia</option>
+                                                <option value="🇹🇭 Thailand">🇹🇭 Thailand</option>
+                                                <option value="🇻🇳 Vietnam">🇻🇳 Vietnam</option>
+                                                <option value="🇦🇪 UAE">🇦🇪 UAE</option>
+                                                <option value="🇸🇦 Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                                                <option value="🇮🇱 Israel">🇮🇱 Israel</option>
+                                                <option value="🇹🇷 Turkey">🇹🇷 Turkey</option>
+                                                <option value="🇬🇷 Greece">🇬🇷 Greece</option>
+                                                <option value="🇭🇺 Hungary">🇭🇺 Hungary</option>
+                                                <option value="🇷🇴 Romania">🇷🇴 Romania</option>
+                                                <option value="🇺🇦 Ukraine">🇺🇦 Ukraine</option>
+                                                <option value="🇫🇮 Finland">🇫🇮 Finland</option>
+                                                <option value="🇮🇸 Iceland">🇮🇸 Iceland</option>
                                             </select>
                                         </div>
                                     </div>
