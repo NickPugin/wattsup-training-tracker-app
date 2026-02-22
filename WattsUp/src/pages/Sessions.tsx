@@ -162,16 +162,18 @@ export default function Sessions({ session }: { session: Session }) {
                                                 </div>
 
                                                 <div className="session-time">
-                                                    <span className="sm-label">Time: </span>{s.minutes}min
+                                                    <span className="sm-label">Time: </span>
+                                                    <div>{s.minutes}min</div>
                                                 </div>
 
                                                 <div className="session-watts">
-                                                    <span className="sm-label">Avg: </span>{s.average_wattage}watts
+                                                    <span className="sm-label">Avg: </span>
+                                                    <div>{s.average_wattage}watts</div>
                                                 </div>
 
                                                 <div className="session-energy">
                                                     <span className="sm-label">Total energy: </span>
-                                                    {parseFloat(s.kwh).toFixed(2)} <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>kWh</span>
+                                                    <div>{parseFloat(s.kwh).toFixed(2)} <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>kWh</span></div>
                                                 </div>
 
                                                 <div className="session-actions" style={{ textAlign: 'right' }}>
