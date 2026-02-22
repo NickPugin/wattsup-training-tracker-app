@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { Trophy, TrendingUp, Clock, Zap } from 'lucide-react'
@@ -7,6 +7,9 @@ import ProfileModal from '../components/ProfileModal'
 
 export default function Dashboard({ session }: { session: Session }) {
     const [loading, setLoading] = useState(true)
+
+    // Reference for scrolling to the user's row
+    const userRowRef = useRef<HTMLTableRowElement>(null)
     const [leaderboard, setLeaderboard] = useState<any[]>([])
     const [selectedUser, setSelectedUser] = useState<string | null>(null)
 
@@ -192,34 +195,42 @@ export default function Dashboard({ session }: { session: Session }) {
                             </select>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: rankBg, border: `1px solid ${rankBorder}`, padding: '6px 12px', borderRadius: '20px' }}>
+                    <button
+                        onClick={() => userRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: rankBg, border: `1px solid ${rankBorder}`, padding: '6px 12px', borderRadius: '20px', cursor: 'pointer', transition: 'transform 0.2s', outline: 'none' }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        title="Scroll to my position"
+                    >
                         <Trophy size={16} color={rankColor} />
                         <span style={{ fontSize: '0.875rem', fontWeight: 700, color: rankColor }}>
                             Your Rank: #{myRank > 0 ? myRank : '-'}
                         </span>
-                    </div>
+                    </button>
                 </div>
 
                 {loading ? (
                     <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading standings...</div>
                 ) : (
-                    <div style={{ overflowX: 'auto' }}>
+                    <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '500px' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead>
-                                <tr style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                                    <th style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Rank</th>
-                                    <th style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Rider</th>
-                                    <th className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem' }}>Total Hours</th>
-                                    <th style={{ padding: '16px 20px', color: 'var(--primary)', fontWeight: 700, fontSize: '0.875rem' }}>Total kWh</th>
+                            <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bg-base)' }}>
+                                <tr>
+                                    <th style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem', borderBottom: '1px solid var(--border)' }}>Rank</th>
+                                    <th style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem', borderBottom: '1px solid var(--border)' }}>Rider</th>
+                                    <th className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.875rem', borderBottom: '1px solid var(--border)' }}>Total Hours</th>
+                                    <th style={{ padding: '16px 20px', color: 'var(--primary)', fontWeight: 700, fontSize: '0.875rem', borderBottom: '1px solid var(--border)' }}>Total kWh</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {leaderboard.map((rider, index) => (
                                     <tr
                                         key={rider.id}
+                                        ref={rider.id === session.user.id ? userRowRef : null}
                                         style={{
-                                            borderTop: '1px solid var(--border)',
+                                            borderTop: index === 0 ? 'none' : '1px solid var(--border)',
                                             backgroundColor: rider.id === session.user.id ? 'var(--bg-overlay)' : 'transparent',
+                                            boxShadow: rider.id === session.user.id ? 'inset 2px 0 0 0 var(--primary), inset -2px 0 0 0 var(--primary)' : 'none',
                                             transition: 'background 0.2s'
                                         }}
                                     >
@@ -241,10 +252,10 @@ export default function Dashboard({ session }: { session: Session }) {
                                                         </div>
                                                     )}
                                                     <span className="text-gradient hover:underline">
-                                                        {rider.nationality ? rider.nationality.substring(0, 2) + ' ' : ''}{rider.username}
+                                                        {rider.nationality ? rider.nationality.substring(0, 2) + ' ' : ''}
+                                                        {rider.username.length > 15 ? rider.username.substring(0, 15) + '...' : rider.username}
                                                     </span>
                                                 </button>
-                                                {rider.id === session.user.id && <span style={{ fontSize: '0.75rem', padding: '2px 6px', background: 'var(--primary)', borderRadius: '12px', color: 'white' }}>You</span>}
                                             </div>
                                         </td>
                                         <td className="hide-mobile" style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>{rider.total_hours}h</td>

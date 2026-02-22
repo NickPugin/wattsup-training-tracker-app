@@ -226,7 +226,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
 
                                     <div>
                                         <label>Username</label>
-                                        <input type="text" placeholder="e.g. SprintKing" value={username} onChange={e => setUsername(e.target.value)} maxLength={20} required />
+                                        <input type="text" placeholder="e.g. SprintKing" value={username} onChange={e => setUsername(e.target.value)} maxLength={15} required />
                                     </div>
 
                                     <div>
