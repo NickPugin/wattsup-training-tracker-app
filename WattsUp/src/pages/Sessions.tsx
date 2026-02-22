@@ -149,7 +149,7 @@ export default function Sessions({ session }: { session: Session }) {
                                                 <div className="session-date">
                                                     {dayjs(s.date).format('MMM D, YY')}
                                                 </div>
-                                                
+
                                                 <div className="session-rider">
                                                     {s.profiles?.picture_url ? (
                                                         <img src={`/avatars/${s.profiles.picture_url}`} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border)', backgroundColor: 'var(--bg-base)' }} />
@@ -160,19 +160,20 @@ export default function Sessions({ session }: { session: Session }) {
                                                     )}
                                                     <span style={{ fontWeight: 600 }}>{s.profiles?.username || 'Unknown'}</span>
                                                 </div>
-                                                
+
                                                 <div className="session-time">
-                                                    <span className="sm-label">Time: </span>{s.minutes}m
+                                                    <span className="sm-label">Time: </span>{s.minutes}min
                                                 </div>
-                                                
+
                                                 <div className="session-watts">
-                                                    <span className="sm-label">Avg: </span>{s.average_wattage}W
+                                                    <span className="sm-label">Avg: </span>{s.average_wattage}watts
                                                 </div>
-                                                
+
                                                 <div className="session-energy">
+                                                    <span className="sm-label">Total energy: </span>
                                                     {parseFloat(s.kwh).toFixed(2)} <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>kWh</span>
                                                 </div>
-                                                
+
                                                 <div className="session-actions" style={{ textAlign: 'right' }}>
                                                     {isOwner && (
                                                         <button

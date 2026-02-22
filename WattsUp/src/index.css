@@ -364,7 +364,7 @@ button {
   .session-rider {
     grid-column: 2 / 4;
     grid-row: 1;
-    justify-content: flex-end;
+    justify-content: flex-start;
     padding-right: 32px;
     /* Pad to avoid absolute delete btn */
   }
@@ -399,9 +399,9 @@ button {
     grid-row: 3;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-end;
-    font-size: 1.25rem;
+    justify-content: flex-start;
+    align-items: flex-start;
+    font-size: 1rem;
   }
 
   .sm-label {
