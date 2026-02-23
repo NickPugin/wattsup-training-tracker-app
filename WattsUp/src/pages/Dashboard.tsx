@@ -11,11 +11,13 @@ export default function Dashboard({ session }: { session: Session }) {
     // Reference for scrolling to the user's row
     const userRowRef = useRef<HTMLTableRowElement>(null)
     const [leaderboard, setLeaderboard] = useState<any[]>([])
+    const [showProfileModal, setShowProfileModal] = useState(false)
     const [selectedUser, setSelectedUser] = useState<string | null>(null)
 
     // Filtering State
     const [groups, setGroups] = useState<any[]>([])
     const [selectedGroup, setSelectedGroup] = useState<string>('global')
+    const [forceOnboarding, setForceOnboarding] = useState(false)
 
     useEffect(() => {
         fetchMyGroups()
@@ -77,6 +79,26 @@ export default function Dashboard({ session }: { session: Session }) {
                 setLeaderboard([])
                 setLoading(false)
                 return
+            }
+
+            // Check if the current user exists in the profiles data and has a username
+            // We use 'session.user.id' to always check their own profile, regardless of the active global/group filter
+            const { data: myProfileCheck, error: myProfileErr } = await supabase
+                .from('profiles')
+                .select('username')
+                .eq('id', session.user.id)
+                .single()
+
+            if (myProfileErr && myProfileErr.code !== 'PGRST116') {
+                console.error("Error checking user profile:", myProfileErr)
+            }
+
+            if (!myProfileCheck || !myProfileCheck.username || myProfileCheck.username.trim() === '') {
+                setForceOnboarding(true)
+                setSelectedUser(session.user.id)
+                setShowProfileModal(true)
+            } else {
+                setForceOnboarding(false)
             }
 
             // 2. Fetch sessions specifically for these users

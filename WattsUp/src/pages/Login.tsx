@@ -7,7 +7,6 @@ export default function Login() {
     const [isSignUp, setIsSignUp] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [username, setUsername] = useState('')
     const [error, setError] = useState<string | null>(null)
 
     const handleAuth = async (e: React.FormEvent) => {
@@ -24,25 +23,6 @@ export default function Login() {
                 })
 
                 if (authError) throw authError
-
-                // 2. Create their public profile
-                if (authData.user) {
-                    const { error: profileError } = await supabase
-                        .from('profiles')
-                        .insert([
-                            {
-                                id: authData.user.id,
-                                username: username
-                            }
-                        ])
-
-                    if (profileError) {
-                        console.error("Profile creation error:", profileError)
-                        // We won't throw here to avoid completely blocking the user if just the profile failed,
-                        // but ideally we'd want a robust rollback or trigger.
-                        throw new Error(`Profile creation failed: ${JSON.stringify(profileError)}`)
-                    }
-                }
             } else {
                 // Sign In
                 const { error } = await supabase.auth.signInWithPassword({
@@ -79,20 +59,6 @@ export default function Login() {
                 )}
 
                 <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                    {isSignUp && (
-                        <div>
-                            <label htmlFor="username">Rider Username</label>
-                            <input
-                                id="username"
-                                type="text"
-                                required
-                                placeholder="e.g. WattMonster99"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </div>
-                    )}
 
                     <div>
                         <label htmlFor="email">Email Address</label>

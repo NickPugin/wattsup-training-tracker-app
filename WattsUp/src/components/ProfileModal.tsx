@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 
-export default function ProfileModal({ userId, currentUserId, onClose, onProfileUpdate }: { userId: string, currentUserId: string, onClose: () => void, onProfileUpdate?: () => void }) {
+export default function ProfileModal({ userId, currentUserId, onClose, onProfileUpdate, isOnboarding = false }: { userId: string, currentUserId: string, onClose: () => void, onProfileUpdate?: () => void, isOnboarding?: boolean }) {
     const scrollRef = useRef<HTMLDivElement>(null)
     const avatars = ['labrador.png', 'monkey.png', 'chicken.png', 'grizzly_bear.png', 'panda.png', 'shark.png', 'octopus.png', 'sloth.png', 'mouse.png', 'lizard.png', 'dino.png', 'lion.png', 'cactus.png', 'lemon.png', 'tortoise.png', 'hare.png', 'cat.png', 'rocket.png', 'frog.png', 'bird.png']
 
@@ -305,8 +305,10 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                         <input type="number" placeholder="e.g. 250" value={ftp} onChange={e => setFtp(e.target.value)} />
                                     </div>
                                     <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                                        <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setIsEditing(false)}>Cancel</button>
-                                        <button className="btn-primary" style={{ flex: 1 }} onClick={handleSave} disabled={isSaving}>{isSaving ? 'Saving...' : 'Save'}</button>
+                                        {!isOnboarding && (
+                                            <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setIsEditing(false)}>Cancel</button>
+                                        )}
+                                        <button className="btn-primary" style={{ flex: 1 }} onClick={handleSave} disabled={isSaving || !username}>{isSaving ? 'Saving...' : 'Save Profile'}</button>
                                     </div>
                                 </div>
                             ) : (
@@ -341,14 +343,15 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                     )}
                                 </div>
                             )}
+                            {/* Hide the bottom close button if onboarding */}
+                            {!isOnboarding && (
+                                <button className="btn-secondary" style={{ width: '100%', marginTop: '16px' }} onClick={onClose}>
+                                    Close Window
+                                </button>
+                            )}
                         </div>
-
-                        <button className="btn-secondary" style={{ width: '100%' }} onClick={onClose}>
-                            Close Window
-                        </button>
                     </>
                 )}
-
             </div>
         </div>
     )
