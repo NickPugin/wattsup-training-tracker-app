@@ -7,7 +7,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
 
     const [profile, setProfile] = useState<any>(null)
     const [loading, setLoading] = useState(true)
-    const [isEditing, setIsEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(isOnboarding)
 
     // Edit form state
     const [username, setUsername] = useState('')
@@ -62,16 +62,20 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
             setProfile(data)
             setUsername(data.username || '')
             setNationality(data.nationality || '')
-            // Default to true if somehow undefined, mapping to the new DB default
             setIsPublic(data.is_public !== false)
-            // Note: we're reusing bike_type in the DB as bike_model to keep the schema simple
             setBikeModel(data.bike_type || '')
             setBikeNickname(data.bike_nickname || '')
             setFtp(data.estimated_ftp?.toString() || '')
             setPictureUrl(data.picture_url || '')
             setCatchphrase(data.catchphrase || '')
-        } catch (error) {
-            console.error('Error fetching profile:', error)
+        } catch (error: any) {
+            // PGRST116 means zero rows found. If we are onboarding, this is expected!
+            if (error.code === 'PGRST116' && isOnboarding) {
+                // Prime an empty profile so the UI renders the edit form
+                setProfile({ id: userId, is_public: true })
+            } else {
+                console.error('Error fetching profile:', error)
+            }
         } finally {
             setLoading(false)
         }
@@ -82,7 +86,8 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
         try {
             const { error } = await supabase
                 .from('profiles')
-                .update({
+                .upsert({
+                    id: userId,
                     username: username,
                     nationality: nationality,
                     is_public: isPublic,
@@ -92,7 +97,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                     picture_url: pictureUrl,
                     catchphrase: catchphrase
                 })
-                .eq('id', userId)
+                .select()
 
             if (error) throw error
             setIsEditing(false)
