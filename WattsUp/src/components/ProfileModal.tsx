@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 export default function ProfileModal({ userId, currentUserId, onClose, onProfileUpdate }: { userId: string, currentUserId: string, onClose: () => void, onProfileUpdate?: () => void }) {
     const scrollRef = useRef<HTMLDivElement>(null)
-    const avatars = ['dino.png', 'lion.png', 'owl.png', 'cactus.png', 'lemon.png', 'tortoise.png', 'hare.png', 'fox.png', 'cat.png', 'rocket.png', 'frog.png', 'moose.png', 'bird.png']
+    const avatars = ['shark.png', 'octopus.png', 'sloth.png', 'mouse.png', 'lizard.png', 'dino.png', 'lion.png', 'owl.png', 'cactus.png', 'lemon.png', 'tortoise.png', 'hare.png', 'fox.png', 'cat.png', 'rocket.png', 'frog.png', 'moose.png', 'bird.png']
 
     const [profile, setProfile] = useState<any>(null)
     const [loading, setLoading] = useState(true)
