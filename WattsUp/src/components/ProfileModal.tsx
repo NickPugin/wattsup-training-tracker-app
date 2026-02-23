@@ -72,7 +72,7 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
             // PGRST116 means zero rows found. If we are onboarding, this is expected!
             if (error.code === 'PGRST116' && isOnboarding) {
                 // Prime an empty profile so the UI renders the edit form
-                setProfile({ id: userId, is_public: true })
+                setProfile({ id: userId, is_public: true, username: '' })
             } else {
                 console.error('Error fetching profile:', error)
             }
@@ -123,10 +123,10 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                 <img src={`/avatars/${profile.picture_url}`} alt={profile.username} style={{ width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto 16px', display: 'block', objectFit: 'cover', border: '2px solid var(--primary)', backgroundColor: 'var(--bg-base)' }} />
                             ) : (
                                 <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--primary)', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', color: 'white' }}>
-                                    {profile.username.charAt(0).toUpperCase()}
+                                    {profile.username ? profile.username.charAt(0).toUpperCase() : '?'}
                                 </div>
                             )}
-                            <h2 className="text-gradient" style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{profile.username}</h2>
+                            <h2 className="text-gradient" style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{profile.username || 'New Rider'}</h2>
 
                             {profile.catchphrase && (
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontStyle: 'italic', marginBottom: '8px' }}>
