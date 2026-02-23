@@ -315,8 +315,13 @@ export default function Dashboard({ session }: { session: Session }) {
                     <ProfileModal
                         userId={selectedUser}
                         currentUserId={session.user.id}
-                        onClose={() => setSelectedUser(null)}
+                        onClose={() => {
+                            if (!forceOnboarding) {
+                                setSelectedUser(null)
+                            }
+                        }}
                         onProfileUpdate={fetchLeaderboard}
+                        isOnboarding={forceOnboarding}
                     />
                 )
             }
