@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import { Trophy, TrendingUp, Clock, Zap, EyeOff } from 'lucide-react'
+import { Trophy, TrendingUp, Clock, Zap, EyeOff, XCircle, CheckCircle } from 'lucide-react'
 
 import ProfileModal from '../components/ProfileModal'
 
@@ -19,7 +19,25 @@ export default function Dashboard({ session }: { session: Session }) {
     const [selectedGroup, setSelectedGroup] = useState<string>('global')
     const [forceOnboarding, setForceOnboarding] = useState(false)
 
+    // Toast Notification State
+    const [toastMessage, setToastMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null)
+
     useEffect(() => {
+        // Check for URL parameters from Strava OAuth redirects
+        const searchParams = new URLSearchParams(window.location.search)
+        const stravaError = searchParams.get('strava_error')
+        const stravaSync = searchParams.get('strava_sync')
+
+        if (stravaError) {
+            setToastMessage({ type: 'error', text: `Strava Connection Failed: ${decodeURIComponent(stravaError)}` })
+            window.history.replaceState({}, '', '/dashboard')
+            setTimeout(() => setToastMessage(null), 5000)
+        } else if (stravaSync === 'success') {
+            setToastMessage({ type: 'success', text: 'Strava connected successfully! Activities will now auto-sync.' })
+            window.history.replaceState({}, '', '/dashboard')
+            setTimeout(() => setToastMessage(null), 5000)
+        }
+
         fetchMyGroups()
     }, [])
 
@@ -175,7 +193,31 @@ export default function Dashboard({ session }: { session: Session }) {
     const rankBorder = getRankBorder(myRank)
 
     return (
-        <div className="container" style={{ paddingBottom: '100px' }}>
+        <div className="container" style={{ paddingBottom: '100px', position: 'relative' }}>
+
+            {/* Toast Notification */}
+            {toastMessage && (
+                <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 2000,
+                    backgroundColor: toastMessage.type === 'error' ? '#fee2e2' : '#dcfce7',
+                    color: toastMessage.type === 'error' ? '#991b1b' : '#166534',
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    border: `1px solid ${toastMessage.type === 'error' ? '#f87171' : '#86efac'}`,
+                    animation: 'fade-in 0.3s ease-out'
+                }}>
+                    {toastMessage.type === 'error' ? <XCircle size={20} /> : <CheckCircle size={20} />}
+                    <span style={{ fontWeight: 600 }}>{toastMessage.text}</span>
+                </div>
+            )}
 
             {/* Top Welcome Section */}
             <div style={{ marginBottom: '32px' }}>
