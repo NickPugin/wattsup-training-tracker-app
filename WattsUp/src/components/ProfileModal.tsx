@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import { KeyRound, AlertCircle, CheckCircle } from 'lucide-react'
 
 export default function ProfileModal({ userId, currentUserId, onClose, onProfileUpdate, isOnboarding = false }: { userId: string, currentUserId: string, onClose: () => void, onProfileUpdate?: () => void, isOnboarding?: boolean }) {
     const scrollRef = useRef<HTMLDivElement>(null)
@@ -19,6 +20,14 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
     const [pictureUrl, setPictureUrl] = useState('')
     const [catchphrase, setCatchphrase] = useState('')
     const [isSaving, setIsSaving] = useState(false)
+
+    // Account settings state
+    const [showAccountSettings, setShowAccountSettings] = useState(false)
+    const [newEmail, setNewEmail] = useState('')
+    const [currentPassword, setCurrentPassword] = useState('')
+    const [isEmailLoading, setIsEmailLoading] = useState(false)
+    const [isPasswordResetLoading, setIsPasswordResetLoading] = useState(false)
+    const [accountSettingsMessage, setAccountSettingsMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null)
 
     const isOwner = userId === currentUserId
 
@@ -107,6 +116,54 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
             alert(error.message || 'Failed to update profile')
         } finally {
             setIsSaving(false)
+        }
+    }
+
+    const handleUpdateEmail = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsEmailLoading(true)
+        setAccountSettingsMessage(null)
+        try {
+            // First re-authenticate to prove identity
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user?.email) throw new Error("Could not find your current email address.")
+
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: currentPassword
+            })
+            if (signInError) throw new Error("Incorrect current password. Cannot change email.")
+
+            const { error: updateError } = await supabase.auth.updateUser({
+                email: newEmail
+            })
+            if (updateError) throw updateError
+
+            setAccountSettingsMessage({ type: 'success', text: 'Success! Please check both your old and new email addresses for confirmation links.' })
+            setNewEmail('')
+            setCurrentPassword('')
+        } catch (error: any) {
+            setAccountSettingsMessage({ type: 'error', text: error.message })
+        } finally {
+            setIsEmailLoading(false)
+        }
+    }
+
+    const handleResetPassword = async () => {
+        setIsPasswordResetLoading(true)
+        setAccountSettingsMessage(null)
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user?.email) throw new Error("Could not find your current email address.")
+
+            const { error } = await supabase.auth.resetPasswordForEmail(user.email)
+            if (error) throw error
+
+            setAccountSettingsMessage({ type: 'success', text: 'Password reset email sent! Check your inbox for the secure link.' })
+        } catch (error: any) {
+            setAccountSettingsMessage({ type: 'error', text: error.message })
+        } finally {
+            setIsPasswordResetLoading(false)
         }
     }
 
@@ -352,33 +409,74 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                     </div>
 
                                     {/* Strava Integration Display */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(252, 76, 2, 0.1)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ color: '#fc4c02', fontWeight: 'bold' }}>Strava Sync</span>
-                                        </div>
-                                        {profile.strava_athlete_id ? (
-                                            <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></div>
-                                                Connected
-                                            </span>
-                                        ) : (
-                                            isOwner ? (
+                                    {isOwner && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(252, 76, 2, 0.1)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span style={{ color: '#fc4c02', fontWeight: 'bold' }}>Strava Sync</span>
+                                            </div>
+                                            {profile.strava_athlete_id ? (
+                                                <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></div>
+                                                    Connected
+                                                </span>
+                                            ) : (
                                                 <button
                                                     onClick={handleStravaConnect}
                                                     style={{ backgroundColor: '#fc4c02', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}
                                                 >
                                                     Connect
                                                 </button>
-                                            ) : (
-                                                <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Not Connected</span>
-                                            )
-                                        )}
-                                    </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     {isOwner && (
-                                        <button className="btn-secondary" style={{ marginTop: '16px', fontSize: '0.875rem' }} onClick={() => setIsEditing(true)}>
-                                            Edit Profile Details
-                                        </button>
+                                        <>
+                                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                                                <button className="btn-secondary" style={{ flex: 1, fontSize: '0.875rem' }} onClick={() => { setIsEditing(true); setShowAccountSettings(false) }}>
+                                                    Edit Profile Details
+                                                </button>
+                                                <button className="btn-secondary" style={{ flex: 1, fontSize: '0.875rem' }} onClick={() => setShowAccountSettings(!showAccountSettings)}>
+                                                    {showAccountSettings ? 'Hide Settings' : 'Account Settings'}
+                                                </button>
+                                            </div>
+
+                                            {showAccountSettings && (
+                                                <div style={{ marginTop: '16px', padding: '16px', backgroundColor: 'var(--bg-base)', borderRadius: '8px', border: '1px solid var(--border)', animation: 'fade-in 0.2s ease-out' }}>
+                                                    <h3 style={{ fontSize: '1.125rem', marginBottom: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <KeyRound size={18} /> Account Security
+                                                    </h3>
+
+                                                    {accountSettingsMessage && (
+                                                        <div style={{ padding: '12px', marginBottom: '16px', borderRadius: '6px', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: accountSettingsMessage.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)', color: accountSettingsMessage.type === 'error' ? 'var(--danger)' : 'var(--success)', border: `1px solid ${accountSettingsMessage.type === 'error' ? 'var(--danger)' : 'var(--success)'}` }}>
+                                                            {accountSettingsMessage.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
+                                                            <span>{accountSettingsMessage.text}</span>
+                                                        </div>
+                                                    )}
+
+                                                    <form onSubmit={handleUpdateEmail} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                                                        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)' }}>Change Email Address</div>
+                                                        <div>
+                                                            <input type="email" placeholder="New Email Address" required value={newEmail} onChange={e => setNewEmail(e.target.value)} style={{ width: '100%', fontSize: '0.875rem', padding: '10px' }} />
+                                                        </div>
+                                                        <div>
+                                                            <input type="password" placeholder="Current Password (Required)" required value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} style={{ width: '100%', fontSize: '0.875rem', padding: '10px' }} />
+                                                        </div>
+                                                        <button type="submit" className="btn-primary" disabled={isEmailLoading} style={{ fontSize: '0.875rem', padding: '8px' }}>
+                                                            {isEmailLoading ? 'Updating Email...' : 'Update Email'}
+                                                        </button>
+                                                    </form>
+
+                                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                                                        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '8px' }}>Reset Password</div>
+                                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.4 }}>We will send a secure password reset link to your current email address inbox.</p>
+                                                        <button type="button" className="btn-secondary" onClick={handleResetPassword} disabled={isPasswordResetLoading} style={{ width: '100%', fontSize: '0.875rem', padding: '8px' }}>
+                                                            {isPasswordResetLoading ? 'Sending link...' : 'Send Password Reset Email'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             )}
