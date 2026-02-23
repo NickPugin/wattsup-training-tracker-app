@@ -63,8 +63,8 @@ export default function Login() {
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                 <Activity size={48} color="var(--primary)" style={{ marginBottom: '16px' }} />
-                <h1 className="text-gradient">CycleTeam Tracker</h1>
-                <p className="text-muted" style={{ marginTop: '8px' }}>Log your watts. Track your kWh. Crush the leaderboard.</p>
+                <h1 className="text-gradient">WattsUp Training Tracker</h1>
+                <p className="text-muted" style={{ marginTop: '8px' }}>Log your sessions. Track your total power. Compete on the leaderboard.</p>
             </div>
 
             <div className="glass-card animate-fade-in" style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
