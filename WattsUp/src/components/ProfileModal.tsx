@@ -110,6 +110,16 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
         }
     }
 
+    const handleStravaConnect = () => {
+        const clientId = import.meta.env.VITE_STRAVA_CLIENT_ID
+        // In production, use window.location.origin. In local dev, use http://localhost:5173
+        const redirectUri = `${window.location.origin}/api/strava/callback`
+        const scope = 'activity:read_all'
+
+        const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=${scope}&state=${userId}`
+        window.location.href = stravaAuthUrl
+    }
+
     return (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', overflowY: 'auto' }}>
             <div className="glass-card animate-fade-in" style={{ width: '100%', maxWidth: '400px', backgroundColor: 'var(--bg-surface)', display: 'flex', flexDirection: 'column' }}>
@@ -339,6 +349,30 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
                                         <span style={{ color: 'var(--text-muted)' }}>Nationality</span>
                                         <span style={{ fontWeight: 600 }}>{profile.nationality || 'None'}</span>
+                                    </div>
+
+                                    {/* Strava Integration Display */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(252, 76, 2, 0.1)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span style={{ color: '#fc4c02', fontWeight: 'bold' }}>Strava Sync</span>
+                                        </div>
+                                        {profile.strava_athlete_id ? (
+                                            <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></div>
+                                                Connected
+                                            </span>
+                                        ) : (
+                                            isOwner ? (
+                                                <button
+                                                    onClick={handleStravaConnect}
+                                                    style={{ backgroundColor: '#fc4c02', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}
+                                                >
+                                                    Connect
+                                                </button>
+                                            ) : (
+                                                <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Not Connected</span>
+                                            )
+                                        )}
                                     </div>
 
                                     {isOwner && (
