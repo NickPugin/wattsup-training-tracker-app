@@ -42,7 +42,7 @@ export default function Login() {
         <div className="container" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100vh', padding: '24px' }}>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <img src="/favicon_transparent_320.png" alt="WattsUp Logo" style={{ width: '64px', height: '64px', marginBottom: '16px' }} />
+                <img src="/favicon_transparent_320.png" alt="WattsUp Logo" style={{ width: '128px', height: '128px', marginBottom: '8px' }} />
                 <h1 className="text-gradient">WattsUp Training Tracker</h1>
                 <p className="text-muted" style={{ marginTop: '8px' }}>Log your sessions. Track your total power. Compete on the leaderboard.</p>
             </div>
