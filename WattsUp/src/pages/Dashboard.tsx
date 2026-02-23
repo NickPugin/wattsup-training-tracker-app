@@ -30,11 +30,11 @@ export default function Dashboard({ session }: { session: Session }) {
 
         if (stravaError) {
             setToastMessage({ type: 'error', text: `Strava Connection Failed: ${decodeURIComponent(stravaError)}` })
-            window.history.replaceState({}, '', '/dashboard')
+            window.history.replaceState({}, '', '/')
             setTimeout(() => setToastMessage(null), 5000)
         } else if (stravaSync === 'success') {
-            setToastMessage({ type: 'success', text: 'Strava connected successfully! Activities will now auto-sync.' })
-            window.history.replaceState({}, '', '/dashboard')
+            setToastMessage({ type: 'success', text: 'Strava connected successfully! Activities will auto-sync.' })
+            window.history.replaceState({}, '', '/')
             setTimeout(() => setToastMessage(null), 5000)
         }
 

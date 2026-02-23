@@ -71,10 +71,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (dbError) throw dbError;
 
         // 4. Redirect the user back to the application Dashboard on success
-        res.redirect('/dashboard?strava_sync=success');
+        res.redirect('/?strava_sync=success');
 
     } catch (err: any) {
         console.error('Strava Callback Handler Error:', err);
-        res.redirect('/dashboard?strava_error=' + encodeURIComponent(err.message));
+        res.redirect('/?strava_error=' + encodeURIComponent(err.message));
     }
 }
