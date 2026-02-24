@@ -4,7 +4,7 @@ import { KeyRound, AlertCircle, CheckCircle } from 'lucide-react'
 
 export default function ProfileModal({ userId, currentUserId, onClose, onProfileUpdate, isOnboarding = false }: { userId: string, currentUserId: string, onClose: () => void, onProfileUpdate?: () => void, isOnboarding?: boolean }) {
     const scrollRef = useRef<HTMLDivElement>(null)
-    const avatars = ['penguin.png', 'hippo.png', 'elephant.png', 'labrador.png', 'monkey.png', 'chicken.png', 'grizzly_bear.png', 'panda.png', 'shark.png', 'octopus.png', 'sloth.png', 'mouse.png', 'lizard.png', 'dino.png', 'lion.png', 'cactus.png', 'lemon.png', 'tortoise.png', 'hare.png', 'cat.png', 'rocket.png', 'frog.png', 'bird.png']
+    const avatars = ['penguin.png', 'hippo.png', 'elephant.png', 'labrador.png', 'monkey.png', 'chicken.png', 'grizzly_bear.png', 'panda.png', 'shark.png', 'octopus.png', 'sloth.png', 'mouse.png', 'lizard.png', 'dino.png', 'lion.png', 'cactus.png', 'lemon.png', 'tortoise.png', 'hare.png', 'cat.png', 'rocket.png', 'frog.png', 'bird.png', 'goat.png', 'raccoon.png', 'pig.png', 'robot.png', 'dynamite.png', 'cheetah.png']
 
     const [profile, setProfile] = useState<any>(null)
     const [loading, setLoading] = useState(true)
