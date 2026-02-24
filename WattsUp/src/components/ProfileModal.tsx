@@ -410,23 +410,28 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
 
                                     {/* Strava Integration Display */}
                                     {isOwner && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(252, 76, 2, 0.1)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <span style={{ color: '#fc4c02', fontWeight: 'bold' }}>Strava Sync</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', backgroundColor: 'rgba(252, 76, 2, 0.1)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span style={{ color: '#fc4c02', fontWeight: 'bold' }}>Strava Sync</span>
+                                                </div>
+                                                {profile.strava_athlete_id ? (
+                                                    <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></div>
+                                                        Connected
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        onClick={handleStravaConnect}
+                                                        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                                                    >
+                                                        <img src="/strava/btn_strava_connect.svg" alt="Connect with Strava" style={{ height: '32px' }} />
+                                                    </button>
+                                                )}
                                             </div>
-                                            {profile.strava_athlete_id ? (
-                                                <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></div>
-                                                    Connected
-                                                </span>
-                                            ) : (
-                                                <button
-                                                    onClick={handleStravaConnect}
-                                                    style={{ backgroundColor: '#fc4c02', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}
-                                                >
-                                                    Connect
-                                                </button>
-                                            )}
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                                <img src="/strava/pwrdBy_strava_white.svg" alt="Powered by Strava" style={{ height: '16px', opacity: 0.8 }} />
+                                            </div>
                                         </div>
                                     )}
 
