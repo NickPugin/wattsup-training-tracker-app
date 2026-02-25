@@ -7,13 +7,8 @@
     "theme_color": "#0f172a",
     "icons": [
         {
-            "src": "/favicon_transparent_320.png",
-            "sizes": "320x320",
-            "type": "image/png"
-        },
-        {
-            "src": "/favicon_transparent_640.png",
-            "sizes": "640x640",
+            "src": "/favicon.png",
+            "sizes": "192x192 512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
