@@ -34,8 +34,8 @@ export default function Layout({ session }: { session: Session }) {
 
                     {/* Logo */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.25rem' }}>
-                        <Zap size={24} color="var(--energy)" />
-                        <span style={{ display: 'none' }} className="sm-show">CycleTeam</span>
+                        <img src="/favicon_transparent_320.png" alt="WattsUp Logo" style={{ width: '24px', height: '24px' }} />
+                        <span style={{ display: 'none' }} className="sm-show">WattsUp</span>
                     </div>
 
                     {/* Navigation Links */}
