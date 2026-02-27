@@ -28,53 +28,90 @@ A web application designed for cycling teams to log, track, and compare their tr
 ## 4. Technical Architecture & Hosting Strategy
 
 ### File Structure Strategy
-We use a monorepo approach where the frontend, backend, and documentation coexist in the same root, simplifying local orchestration via Docker:
+We used a clean frontend monorepo approach, utilizing serverless functions and a hosted database backend:
 ```
 CycleTraining/
-├── frontend/          # React (Vite) client, Vanilla CSS for mobile-first styles
-├── backend/           # Node.js Express server + API
-├── docs/              # Project documentation (PROJECT_PLAN.md)
-└── docker-compose.yml # For spinning up local dev environment (App + DB)
+├── WattsUp/          # Root React (Vite) application directory
+│   ├── src/          # React components, pages, context, and Vanilla CSS
+│   ├── public/       # Static assets and PWA manifest
+│   └── api/          # Vercel Serverless Functions (Strava OAuth, Webhooks)
+├── docs/             # Project documentation and SQL schema migrations
+└── README.md         # Full project documentation
 ```
 
-### Tech Stack Recommendation
-* **Frontend:** **React (powered by Vite)** for fast loading and a dynamic interface.
-* **Styling:** **Vanilla CSS** with a mobile-first approach (CSS Grid/Flexbox). We will design rich interactive components, ensuring the app scales perfectly down to mobile screens.
-* **Backend:** **Node.js (Express)** handling API routes and business logic.
-* **Database:** **PostgreSQL** to handle relationships (Users <-> Sessions) robustly.
+### Final Tech Stack
+* **Frontend:** **React (powered by Vite)** for fast loading and dynamic interfaces.
+* **Styling:** **Vanilla CSS** with a mobile-first glassmorphism design system.
+* **Backend API & Database:** **Supabase (PostgreSQL)** handling real-time API routes (PostgREST), Row Level Security, and complex relational data.
+* **Authentication:** **Supabase Auth** (Email & Password + Security verification flows).
+* **Hosting:** **Vercel** handling the seamless edge deployment of the React app and serverless `api/` endpoints.
 
-### Hosting & Deployment Strategy
-* **Frontend:** **Vercel** or **Netlify** (Not GitHub pages. GH pages struggles with "Single Page Application" routing. Vercel is free, optimized for React/Vite, and handles mobile optimizations superbly.)
-* **Backend:** **Render.com** (Free tier cloud hosting) for our Node instance + PostgreSQL database. 
-  *(Alternative Local Setup if preferred: We can run it in a Docker container on your local server, but we will use **Cloudflare Tunnels** to expose it safely to the internet without opening router ports, ensuring your teammates can access it securely from their own homes.)*
+---
 
-## 5. Step-by-Step Plan of Action
+## 5. Execution Record: Step-by-Step Plan of Action
 
-### Phase 1: Planning and Architecture
-1. **Initialize Project:** Create folder structure (`frontend`, `backend`, `docs`).
-2. **Setup Dev Environment:** Create the local `docker-compose.yml` for database testing, and initialize vite frontend.
+### Phase 1: Planning and Setup (Foundation)
+* Initial Requirements Gathering and Architecture selection (Supabase + Vercel).
+* Initialized React frontend using Vite.
+* Created basic `.env` setup instructions for Supabase keys.
 
-### Phase 2: Backend Development (API & Logic)
-* **Step 5:** Implement User Authentication (signup, login, JWT/session management, password hashing).
-* **Step 6:** Build the `Users/Profiles` API endpoints (GET user, UPDATE user details).
-* **Step 7:** Build the `Sessions` API endpoints (POST new session, DELETE session via ownership check, GET all sessions, GET sessions by user).
-* **Step 8:** Implement the sorting and aggregation logic on the backend to easily serve the Dashboard totals (summing minutes and calculating total kWh).
+### Phase 2: Supabase (Backend/DB) Setup
+* Created `profiles` and `sessions` table schemas.
+* Built and attached fundamental Row Level Security (RLS) policies.
+* Setup Supabase Authentication (Email/Password).
 
-### Phase 3: Frontend Development (UI & Integration)
-* **Step 9:** Setup the frontend application shell and routing (Login page, Dashboard, Sessions Table layout).
-* **Step 10:** Build the Authentication UI (Login and Registration forms) and connect to the backend context/state.
-* **Step 11:** Develop the **Dashboard Page**:
-  * Fetch and render the team totals.
-  * Implement the Profile Pop-up Modal (UI and data fetching).
-* **Step 12:** Develop the **Sessions Page**:
-  * Render the main data table.
-  * Implement the "Add Session" modal triggered by the top-right Plus icon.
-  * Ensure the local kWh calculation works securely/correctly before sending to API.
-  * Implement the specific "click-to-delete" functionality with a confirmation dialog (ensuring only the owner sees this option).
-* **Step 13:** Develop the **User Profile Management**:
-  * Allow the logged-in user to upload a picture and update their bike type and FTP.
+### Phase 3: Frontend Core Settings
+* Installed dependencies (React Router DOM, Supabase JS client, Lucide Icons).
+* Built global CSS & CSS variable design system (Mobile-first, Premium aesthetics).
+* Setup Supabase Auth Client context provider.
 
-### Phase 4: Polish, Testing, and Deployment
-* **Step 14:** General UI/UX polish (responsive design for mobile and desktop, loading states, error handling notifications).
-* **Step 15:** Security and Testing (Test API endpoints, verify session deletion rules, test authentication payload).
-* **Step 16:** Final Build and Deployment (Deploy Database, Backend, and Frontend to platforms like Vercel, Render, or Heroku).
+### Phase 4: Frontend Development (UI & Integration)
+* Built protected Authentication UI (Login / Register flows).
+* Built Dashboard Interface (Responsive Grid Layout & Global Leaderboard Table).
+* Built interactive Sessions Table UI with secure delete permissions.
+* Implemented the "Add Session" modal & background `kWh` Calculation logic.
+* Developed User Profile Pop-ups with custom picture, bike, edit, and catchphrase fields.
+* Generated and integrated the initial core batch of generic vector mascot avatars.
+
+### Phase 5: Groups & Advanced Profiles
+* Wrote SQL migrations for `groups` and `group_members` tables.
+* Added `is_public` boolean architecture to restrict global leaderboard visibility.
+* Created `Groups` UI tab (Create Group, Join via unique 8-char codes).
+* Updated Dashboard and Sessions pages to fetch dynamically filtered DB data based on Group dropdown selections.
+
+### Phase 6: Nationality & UI Polish
+* Created SQL migration adding `nationality` text field to `profiles`.
+* Built out a massive Nationality flag dropdown selector in the Profile UI.
+* Parsed and injected Nationality Emojis into the live dashboard leaderboard.
+* Added QoL `Copy to Clipboard` functionality for Group Invite Codes.
+
+### Phase 7: Leaderboard Scroll & UX Polish
+* Refined active rider highlighting away from simple badges to styled table rows.
+* Applied explicit `max-height` constraints with sticky headers to leaderboard tables.
+* Engineered a React `useRef` `scrollIntoView` system to auto-scroll the user to their rank via a sticky pill button.
+
+### Phase 8: Expanded Avatar Roster
+* Standardized an official `AVATAR_STYLE_GUIDE.md` targeting a "Sporty/Competitive" aesthetic with die-cut sticker outlines and cel-shading.
+* Prompted, generated, and saved an expansive 29-character roster of highly polished Chibi profile avatars.
+* Hand-tuned legacy generic avatars to match the new dynamic style system.
+* Engineered a horizontally scrolling, snap-assisted Profile Modal carousel containing the full 29 avatars.
+
+### Phase 9: Profile Onboarding Flow
+* Streamlined the `Login.tsx` pipeline by stripping out native profile insert actions.
+* Configured `Dashboard.tsx` to trap newly authenticated users without complete profiles.
+* Passed an `isOnboarding` lock prop into `ProfileModal.tsx` forcing users to establish a username, nationality, and avatar prior to viewing team data.
+
+### Phase 10: Strava API Auto-Sync Integration
+* Expanded `profiles` and `sessions` database schemas to accept OAuth keys and `strava_activity_id` bigints to prevent duplication.
+* Registered API App in Strava dev portal and supplied Client ID/Secrets to Vercel environment.
+* Built Vercel serverless `api/strava/callback` for OAuth code-for-token exchanges.
+* Built Vercel serverless `api/strava/webhook` for endpoint subscription challenges and POST event handlers.
+* Programmed rigorous data filtering to guarantee payloads contained cycling activities, moving time, and positive `average_watts` prior to performing `kWh` calculations and DB inserts.
+* Implemented automatic, silent backend token refreshment logic bypassing frontend states.
+
+### Phase 11: Privacy & Account Settings
+* Secured Strava OAuth controls by hiding them from unauthorized profile viewers.
+* Developed an internal "Account Settings" accordion directly inside the Profile Modal.
+* Constructed a "Change Email" flow requiring secondary `signInWithPassword` identity verification checks before pushing updates.
+* Connected "Initiate Password Reset" button to Supabase magic link OTP dispatchers.
+* Standardized app-wide async UI error and success Toast handling.
