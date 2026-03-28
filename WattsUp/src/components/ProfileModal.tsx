@@ -20,6 +20,8 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
     const [pictureUrl, setPictureUrl] = useState('')
     const [catchphrase, setCatchphrase] = useState('')
     const [isSaving, setIsSaving] = useState(false)
+    const [isSyncing, setIsSyncing] = useState(false)
+    const [syncMessage, setSyncMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
     // Account settings state
     const [showAccountSettings, setShowAccountSettings] = useState(false)
@@ -175,6 +177,30 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
 
         const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=${scope}&state=${userId}`
         window.location.href = stravaAuthUrl
+    }
+
+    const handleStravaSync = async () => {
+        setIsSyncing(true)
+        setSyncMessage(null)
+        try {
+            const response = await fetch('/api/strava/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            })
+            const data = await response.json()
+            if (!response.ok) throw new Error(data.error || 'Sync failed')
+            setSyncMessage({
+                type: 'success',
+                text: data.syncedCount > 0
+                    ? `Synced ${data.syncedCount} ride${data.syncedCount !== 1 ? 's' : ''}!`
+                    : 'All rides already up to date.'
+            })
+        } catch (err: any) {
+            setSyncMessage({ type: 'error', text: err.message || 'Sync failed. Please try again.' })
+        } finally {
+            setIsSyncing(false)
+        }
     }
 
     return (
@@ -429,6 +455,22 @@ export default function ProfileModal({ userId, currentUserId, onClose, onProfile
                                                     </button>
                                                 )}
                                             </div>
+                                            {profile.strava_athlete_id && (
+                                                <>
+                                                    <button
+                                                        onClick={handleStravaSync}
+                                                        disabled={isSyncing}
+                                                        style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(252,76,2,0.4)', backgroundColor: 'rgba(252,76,2,0.15)', color: '#fc4c02', fontWeight: 600, fontSize: '0.8125rem', cursor: isSyncing ? 'not-allowed' : 'pointer', opacity: isSyncing ? 0.7 : 1, transition: 'all 0.2s' }}
+                                                    >
+                                                        {isSyncing ? '⏳ Syncing...' : '🔄 Sync Last 3 Months'}
+                                                    </button>
+                                                    {syncMessage && (
+                                                        <div style={{ fontSize: '0.8rem', textAlign: 'center', color: syncMessage.type === 'success' ? 'var(--success)' : 'var(--danger)', marginTop: '2px' }}>
+                                                            {syncMessage.text}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
                                             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
                                                 <img src="/strava/pwrdBy_strava_white.svg" alt="Powered by Strava" style={{ height: '16px', opacity: 0.8 }} />
                                             </div>
