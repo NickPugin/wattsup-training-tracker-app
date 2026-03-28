@@ -99,10 +99,13 @@ async function processStravaEvent(event: any) {
     const activityData = await activityResponse.json();
 
     // 4. Strict Filtering Logic
+    // NOTE: Strava deprecated the `type` field in 2023 in favour of `sport_type`.
+    // We check sport_type first and fall back to type for any older data.
     const validTypes = ['Ride', 'VirtualRide', 'EBikeRide'];
+    const activityType = activityData.sport_type || activityData.type;
 
-    if (!validTypes.includes(activityData.type)) {
-        console.log(`Activity ${activityId} is type '${activityData.type}'. Not a ride. Ignoring.`);
+    if (!validTypes.includes(activityType)) {
+        console.log(`Activity ${activityId} is type '${activityType}'. Not a ride. Ignoring.`);
         return;
     }
 
@@ -153,7 +156,8 @@ async function refreshStravaToken(userId: string, refreshToken: string): Promise
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            client_id: process.env.VITE_STRAVA_CLIENT_ID,
+            // VITE_ prefix vars are not available in Node.js serverless — use STRAVA_CLIENT_ID with a fallback
+            client_id: process.env.STRAVA_CLIENT_ID || process.env.VITE_STRAVA_CLIENT_ID,
             client_secret: process.env.STRAVA_CLIENT_SECRET,
             grant_type: 'refresh_token',
             refresh_token: refreshToken

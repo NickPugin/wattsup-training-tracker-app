@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                client_id: process.env.VITE_STRAVA_CLIENT_ID,
+                client_id: process.env.STRAVA_CLIENT_ID || process.env.VITE_STRAVA_CLIENT_ID,
                 client_secret: process.env.STRAVA_CLIENT_SECRET,
                 code: code,
                 grant_type: 'authorization_code'
